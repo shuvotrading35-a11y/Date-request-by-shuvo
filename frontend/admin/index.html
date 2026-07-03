@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel — Date Request Platform</title>
+  <link rel="stylesheet" href="../assets/css/tokens.css" />
+  <link rel="stylesheet" href="../assets/css/global.css" />
+  <link rel="stylesheet" href="../assets/css/animations.css" />
+  <style>
+    body { background: var(--gradient-bg-light); min-height: 100vh; }
+    .admin-layout { display: flex; min-height: 100vh; }
+    .admin-sidebar {
+      width: 260px; flex-shrink: 0;
+      background: rgba(26,10,18,0.97);
+      backdrop-filter: blur(20px);
+      border-right: 1px solid rgba(255,107,157,0.15);
+      display: flex; flex-direction: column;
+      padding: 0;
+      position: sticky; top: 0; height: 100vh; overflow-y: auto;
+    }
+    .admin-brand {
+      padding: var(--space-6);
+      border-bottom: 1px solid rgba(255,107,157,0.15);
+      font-family: var(--font-display); font-size: var(--text-xl);
+      font-weight: 700; color: var(--color-primary);
+    }
+    .admin-brand span { font-size: var(--text-xs); display: block; color: rgba(255,107,157,0.5); font-family: var(--font-body); margin-top: 2px; font-weight: 400; }
+    .admin-nav { padding: var(--space-4) var(--space-3); flex: 1; display: flex; flex-direction: column; gap: var(--space-1); }
+    .admin-nav-item {
+      display: flex; align-items: center; gap: var(--space-3);
+      padding: var(--space-3) var(--space-4);
+      border-radius: var(--radius-xl);
+      font-size: var(--text-sm); font-weight: 600;
+      color: rgba(255,200,200,0.7);
+      cursor: pointer; transition: all 0.2s;
+    }
+    .admin-nav-item:hover { background: rgba(255,107,157,0.12); color: var(--color-primary); }
+    .admin-nav-item.active { background: rgba(255,107,157,0.15); color: var(--color-primary); box-shadow: inset 3px 0 0 var(--color-primary); }
+    .admin-nav-section { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,107,157,0.35); padding: var(--space-4) var(--space-4) var(--space-2); }
+    .admin-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+    .admin-topbar {
+      padding: var(--space-4) var(--space-6);
+      background: rgba(255,240,245,0.92);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255,107,157,0.1);
+      display: flex; align-items: center; justify-content: space-between;
+      gap: var(--space-4); flex-wrap: wrap;
+      position: sticky; top: 0; z-index: 200;
+    }
+    [data-theme="dark"] .admin-topbar { background: rgba(26,10,18,0.95); }
+    .admin-content { padding: var(--space-8) var(--space-6); flex: 1; }
+    .admin-section { display: none; }
+    .admin-section.active { display: block; animation: fadeInUp 0.4s ease both; }
+    .section-title { font-family: var(--font-display); font-size: var(--text-2xl); font-weight: 700; color: var(--color-secondary); margin-bottom: var(--space-6); display: flex; align-items: center; gap: var(--space-3); }
+    .stats-grid-6 { display: grid; grid-template-columns: repeat(3,1fr); gap: var(--space-4); margin-bottom: var(--space-8); }
+    .filter-bar { display: flex; gap: var(--space-3); flex-wrap: wrap; align-items: center; margin-bottom: var(--space-5); }
+    .filter-select { padding: var(--space-2) var(--space-4); border-radius: var(--radius-full); border: 1.5px solid rgba(255,107,157,0.2); background: rgba(255,255,255,0.8); font-family: var(--font-body); font-size: var(--text-sm); color: var(--color-text-primary); backdrop-filter: blur(10px); cursor: pointer; }
+    [data-theme="dark"] .filter-select { background: rgba(42,16,32,0.8); color: var(--color-text-primary); }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 4px; }
+    .status-dot.active   { background: var(--color-success); }
+    .status-dot.suspended{ background: var(--color-danger); }
+    .avatar-sm { width:32px; height:32px; border-radius:50%; background:var(--gradient-primary); color:#fff; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    @media (max-width:1024px) { .stats-grid-6 { grid-template-columns: repeat(2,1fr); } }
+    @media (max-width:768px) {
+      .admin-layout { flex-direction: column; }
+      .admin-sidebar { width:100%; height:auto; position:static; }
+      .admin-nav { flex-direction:row; flex-wrap:wrap; padding:var(--space-2); }
+      .admin-nav-section { display:none; }
+      .admin-content { padding: var(--space-4); }
+      .stats-grid-6 { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="admin-layout">
+
+  <!-- Admin Sidebar -->
+  <aside class="admin-sidebar" role="navigation" aria-label="Admin navigation">
+    <div class="admin-brand">
+      👑 Admin Panel
+      <span>Super Administrator</span>
+    </div>
+    <nav class="admin-nav">
+      <div class="admin-nav-section">Main</div>
+      <div class="admin-nav-item active" data-admin-section="overview">📊 Overview</div>
+      <div class="admin-nav-item" data-admin-section="analytics">📈 Analytics</div>
+
+      <div class="admin-nav-section">Management</div>
+      <div class="admin-nav-item" data-admin-section="users">👥 Users</div>
+      <div class="admin-nav-item" data-admin-section="requests">💌 Requests</div>
+      <div class="admin-nav-item" data-admin-section="responses">💬 Responses</div>
+
+      <div class="admin-nav-section">System</div>
+      <div class="admin-nav-item" data-admin-section="notifications">🔔 Notifications</div>
+      <div class="admin-nav-item" data-admin-section="logs">📋 Audit Logs</div>
+      <div class="admin-nav-item" data-admin-section="settings">⚙️ Settings</div>
+      <div class="admin-nav-item" onclick="logout()" style="margin-top:auto;">🚪 Logout</div>
+    </nav>
+  </aside>
+
+  <!-- Admin Main -->
+  <main class="admin-main">
+    <!-- Topbar -->
+    <div class="admin-topbar">
+      <div>
+        <h1 style="font-family:var(--font-display);font-size:var(--text-xl);color:var(--color-secondary);">👑 Super Admin Panel</h1>
+        <p style="font-size:var(--text-xs);color:var(--color-text-muted);" id="admin-last-updated">Loading...</p>
+      </div>
+      <div style="display:flex;align-items:center;gap:var(--space-3);">
+        <div class="search-bar" style="max-width:260px;">
+          <span class="search-bar__icon">🔍</span>
+          <input class="search-bar__input" type="search" id="global-search" placeholder="Search users, responses..." aria-label="Global search" oninput="globalSearch(this.value)" />
+        </div>
+        <button class="theme-toggle" id="theme-btn" aria-label="Toggle dark mode">🌙</button>
+        <div class="avatar-circle" style="width:36px;height:36px;font-size:12px;" aria-hidden="true">AD</div>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="admin-content">
+
+      <!-- OVERVIEW -->
+      <section class="admin-section active" id="admin-section-overview">
+        <div class="section-title">📊 Platform Overview</div>
+        <div class="stats-grid-6" id="admin-stats-grid">
+          <div class="stat-card glass-card skeleton" style="height:110px;"></div>
+          <div class="stat-card glass-card skeleton" style="height:110px;"></div>
+          <div class="stat-card glass-card skeleton" style="height:110px;"></div>
+          <div class="stat-card glass-card skeleton" style="height:110px;"></div>
+          <div class="stat-card glass-card skeleton" style="height:110px;"></div>
+          <div class="stat-card glass-card skeleton" style="height:110px;"></div>
+        </div>
+
+        <!-- Recent Activity Feed -->
+        <div class="glass-card" style="padding:var(--space-6);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-5);">
+            <h3 style="font-family:var(--font-display);font-size:var(--text-xl);color:var(--color-secondary);">🕐 Recent Activity</h3>
+            <button class="btn btn-ghost btn-sm" onclick="loadAdminSection('responses')">View All →</button>
+          </div>
+          <div id="recent-activity">
+            <div class="skeleton" style="height:60px;border-radius:var(--radius-lg);margin-bottom:var(--space-3);"></div>
+            <div class="skeleton" style="height:60px;border-radius:var(--radius-lg);margin-bottom:var(--space-3);"></div>
+            <div class="skeleton" style="height:60px;border-radius:var(--radius-lg);"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ANALYTICS -->
+      <section class="admin-section" id="admin-section-analytics">
+        <div class="section-title">📈 Platform Analytics</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-6);margin-bottom:var(--space-6);">
+          <div class="glass-card" style="padding:var(--space-6);">
+            <h4 style="font-family:var(--font-display);color:var(--color-secondary);margin-bottom:var(--space-4);">📅 Daily Responses</h4>
+            <canvas id="admin-responses-chart" style="width:100%;"></canvas>
+          </div>
+          <div class="glass-card" style="padding:var(--space-6);">
+            <h4 style="font-family:var(--font-display);color:var(--color-secondary);margin-bottom:var(--space-4);">🍕 Popular Foods</h4>
+            <canvas id="admin-food-chart" style="width:100%;"></canvas>
+          </div>
+          <div class="glass-card" style="padding:var(--space-6);">
+            <h4 style="font-family:var(--font-display);color:var(--color-secondary);margin-bottom:var(--space-4);">📍 Popular Places</h4>
+            <canvas id="admin-place-chart" style="width:100%;"></canvas>
+          </div>
+          <div class="glass-card" style="padding:var(--space-6);">
+            <h4 style="font-family:var(--font-display);color:var(--color-secondary);margin-bottom:var(--space-4);">🎬 Popular Activities</h4>
+            <canvas id="admin-activity-chart" style="width:100%;"></canvas>
+          </div>
+        </div>
+        <div style="display:flex;gap:var(--space-3);">
+          <button class="btn btn-secondary btn-sm" onclick="adminExport('users','csv')">📥 Export Users CSV</button>
+          <button class="btn btn-ghost btn-sm" onclick="adminExport('responses','csv')">📥 Export Responses CSV</button>
+          <button class="btn btn-ghost btn-sm" onclick="adminExport('responses','json')">📦 Export JSON</button>
+        </div>
+      </section>
+
+      <!-- USERS -->
+      <section class="admin-section" id="admin-section-users">
+        <div class="section-title">👥 User Management</div>
+        <div class="filter-bar">
+          <div class="search-bar" style="max-width:260px;">
+            <span class="search-bar__icon">🔍</span>
+            <input class="search-bar__input" type="search" placeholder="Search users..." oninput="filterUsers(this.value)" aria-label="Search users" />
+          </div>
+          <select class="filter-select" id="user-status-filter" onchange="filterUsers()" aria-label="Filter by status">
+            <option value="">All Status</option>
+            <option value="active">Active</option>
+            <option value="suspended">Suspended</option>
+          </select>
+          <button class="btn btn-ghost btn-sm" onclick="adminExport('users','csv')">📥 CSV</button>
+        </div>
+        <div class="table-container">
+          <table class="table" id="users-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>User</th>
+                <th>Email</th>
+                <th>Requests</th>
+                <th>Responses</th>
+                <th>Joined</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="users-tbody">
+              <tr><td colspan="8" style="text-align:center;padding:40px;"><div class="spinner" style="margin:0 auto;"></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:var(--space-4);">
+          <span id="users-count" style="font-size:var(--text-sm);color:var(--color-text-muted);"></span>
+          <div class="pagination" id="users-pagination"></div>
+        </div>
+      </section>
+
+      <!-- REQUESTS -->
+      <section class="admin-section" id="admin-section-requests">
+        <div class="section-title">💌 All Requests</div>
+        <div class="filter-bar">
+          <div class="search-bar" style="max-width:260px;">
+            <span class="search-bar__icon">🔍</span>
+            <input class="search-bar__input" type="search" placeholder="Search requests..." oninput="filterAdminRequests(this.value)" aria-label="Search requests" />
+          </div>
+          <select class="filter-select" onchange="filterAdminRequests()" id="req-status-filter" aria-label="Filter by status">
+            <option value="">All Status</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </div>
+        <div class="table-container">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>#</th><th>Sender</th><th>Token</th><th>Views</th><th>Responses</th><th>Created</th><th>Status</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="admin-requests-tbody">
+              <tr><td colspan="8" style="text-align:center;padding:40px;"><div class="spinner" style="margin:0 auto;"></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- RESPONSES -->
+      <section class="admin-section" id="admin-section-responses">
+        <div class="section-title">💬 All Responses</div>
+        <div class="filter-bar">
+          <div class="search-bar" style="max-width:260px;">
+            <span class="search-bar__icon">🔍</span>
+            <input class="search-bar__input" type="search" placeholder="Search responses..." oninput="filterAdminResponses(this.value)" aria-label="Search responses" />
+          </div>
+          <select class="filter-select" id="resp-status-filter" onchange="filterAdminResponses()" aria-label="Filter by status">
+            <option value="">All Status</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="pending">Pending</option>
+            <option value="rejected">Rejected</option>
+          </select>
+          <select class="filter-select" id="resp-device-filter" onchange="filterAdminResponses()" aria-label="Filter by device">
+            <option value="">All Devices</option>
+            <option value="mobile">Mobile</option>
+            <option value="desktop">Desktop</option>
+          </select>
+          <button class="btn btn-ghost btn-sm" onclick="adminExport('responses','csv')">📥 CSV</button>
+          <button class="btn btn-ghost btn-sm" onclick="adminExport('responses','pdf')">📄 PDF</button>
+        </div>
+        <div class="table-container">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>#</th><th>Sender</th><th>Receiver</th><th>Date</th><th>Place</th>
+                <th>Food</th><th>Love%</th><th>Country</th><th>Device</th><th>Status</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="admin-responses-tbody">
+              <tr><td colspan="11" style="text-align:center;padding:40px;"><div class="spinner" style="margin:0 auto;"></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:var(--space-4);">
+          <span id="responses-count" style="font-size:var(--text-sm);color:var(--color-text-muted);"></span>
+          <div class="pagination" id="responses-pagination"></div>
+        </div>
+      </section>
+
+      <!-- NOTIFICATIONS -->
+      <section class="admin-section" id="admin-section-notifications">
+        <div class="section-title">🔔 Notification Settings</div>
+        <div class="glass-card" style="padding:var(--space-8);max-width:600px;">
+          <h3 style="font-family:var(--font-display);color:var(--color-secondary);margin-bottom:var(--space-6);">Configure Channels</h3>
+          <form onsubmit="saveNotifSettings(event)">
+            <div class="form-group" style="margin-bottom:var(--space-5);">
+              <label class="form-label">🤖 Telegram Bot Token</label>
+              <input class="form-input" type="text" id="tg-bot-token" placeholder="123456:ABCdef..." />
+            </div>
+            <div class="form-group" style="margin-bottom:var(--space-5);">
+              <label class="form-label">📢 Telegram Chat ID</label>
+              <input class="form-input" type="text" id="tg-chat-id" placeholder="-100123456789" />
+              <p class="form-hint">Your admin Telegram chat or group ID</p>
+            </div>
+            <div class="form-group" style="margin-bottom:var(--space-5);">
+              <label class="form-label">📧 Admin Email</label>
+              <input class="form-input" type="email" id="admin-email" placeholder="admin@yourdomain.com" />
+            </div>
+            <div class="form-group" style="margin-bottom:var(--space-5);">
+              <label class="form-label">🎮 Discord Webhook URL</label>
+              <input class="form-input" type="url" id="discord-webhook" placeholder="https://discord.com/api/webhooks/..." />
+            </div>
+            <div style="display:flex;gap:var(--space-3);">
+              <button type="submit" class="btn btn-primary">Save Settings 💾</button>
+              <button type="button" class="btn btn-ghost" onclick="testNotifications()">🧪 Test All</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- AUDIT LOGS -->
+      <section class="admin-section" id="admin-section-logs">
+        <div class="section-title">📋 Audit Logs</div>
+        <div class="filter-bar">
+          <select class="filter-select" id="log-action-filter" onchange="loadLogs()" aria-label="Filter by action">
+            <option value="">All Actions</option>
+            <option value="login">Login</option>
+            <option value="logout">Logout</option>
+            <option value="create">Create</option>
+            <option value="delete">Delete</option>
+            <option value="export">Export</option>
+          </select>
+          <input type="date" class="filter-select" id="log-date-filter" onchange="loadLogs()" style="max-width:180px;" aria-label="Filter by date" />
+        </div>
+        <div class="table-container">
+          <table class="table">
+            <thead>
+              <tr><th>#</th><th>User</th><th>Action</th><th>IP</th><th>Browser</th><th>Time</th></tr>
+            </thead>
+            <tbody id="logs-tbody">
+              <tr><td colspan="6" style="text-align:center;padding:40px;"><div class="spinner" style="margin:0 auto;"></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- SETTINGS -->
+      <section class="admin-section" id="admin-section-settings">
+        <div class="section-title">⚙️ Platform Settings</div>
+        <div class="glass-card" style="padding:var(--space-8);max-width:600px;">
+          <form onsubmit="savePlatformSettings(event)">
+            <div class="form-group" style="margin-bottom:var(--space-5);">
+              <label class="form-label">Site Name</label>
+              <input class="form-input" type="text" id="site-name" placeholder="DateRequest Platform" />
+            </div>
+            <div class="form-group" style="margin-bottom:var(--space-5);">
+              <label class="form-label">Max Requests per User</label>
+              <input class="form-input" type="number" id="max-requests" placeholder="Unlimited = 0" min="0" />
+            </div>
+            <div class="form-group" style="margin-bottom:var(--space-5);">
+              <label class="form-label">Maintenance Mode</label>
+              <label style="display:flex;align-items:center;gap:var(--space-3);cursor:pointer;margin-top:var(--space-2);">
+                <input type="checkbox" id="maintenance-mode" style="accent-color:var(--color-primary);" />
+                <span style="font-size:var(--text-sm);color:var(--color-text-secondary);">Enable maintenance mode (blocks all access except admins)</span>
+              </label>
+            </div>
+            <button type="submit" class="btn btn-primary">Save Platform Settings 💾</button>
+          </form>
+        </div>
+        <div class="glass-card" style="padding:var(--space-8);max-width:600px;margin-top:var(--space-6);border:2px solid rgba(244,67,54,0.2);">
+          <h3 style="font-family:var(--font-display);color:var(--color-danger);margin-bottom:var(--space-4);">⚠️ Danger Zone</h3>
+          <p style="font-size:var(--text-sm);color:var(--color-text-muted);margin-bottom:var(--space-5);">These actions are irreversible. Proceed with extreme caution.</p>
+          <div style="display:flex;gap:var(--space-3);flex-wrap:wrap;">
+            <button class="btn btn-danger btn-sm" onclick="confirmDangerAction('clear-responses')">🗑️ Clear All Responses</button>
+            <button class="btn btn-danger btn-sm" onclick="confirmDangerAction('clear-logs')">📋 Clear Audit Logs</button>
+          </div>
+        </div>
+      </section>
+
+    </div><!-- /admin-content -->
+  </main>
+</div><!-- /admin-layout -->
+
+<!-- Response Detail Modal -->
+<div class="modal-overlay" id="admin-response-modal" role="dialog" aria-modal="true">
+  <div class="modal" style="max-width:580px;">
+    <div class="modal-header">
+      <h3 class="modal-title">💬 Response Detail</h3>
+      <button class="btn btn-icon btn-ghost" onclick="closeModal('admin-response-modal')">✕</button>
+    </div>
+    <div class="modal-body" id="admin-response-detail"></div>
+    <div class="modal-footer" id="admin-response-actions"></div>
+  </div>
+</div>
+
+<!-- Confirm Modal -->
+<div class="modal-overlay" id="confirm-modal" role="dialog" aria-modal="true">
+  <div class="modal" style="max-width:400px;">
+    <div class="modal-body" style="text-align:center;padding:var(--space-10);">
+      <div style="font-size:2.5rem;margin-bottom:var(--space-4);" id="confirm-icon">⚠️</div>
+      <h3 style="font-family:var(--font-display);font-size:var(--text-xl);margin-bottom:var(--space-3);" id="confirm-title">Are you sure?</h3>
+      <p style="color:var(--color-text-muted);margin-bottom:var(--space-6);" id="confirm-message"></p>
+      <div style="display:flex;gap:var(--space-3);justify-content:center;">
+        <button class="btn btn-ghost" onclick="closeModal('confirm-modal')">Cancel</button>
+        <button class="btn btn-danger" id="confirm-ok-btn">Confirm</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container" aria-live="polite"></div>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/auth.js"></script>
+<script src="../assets/js/dashboard.js"></script>
+<script src="../assets/js/admin.js"></script>
+<script>
+  document.getElementById('theme-btn').addEventListener('click', () => applyTheme(APP.theme === 'dark' ? 'light' : 'dark'));
+</script>
+</body>
+</html>

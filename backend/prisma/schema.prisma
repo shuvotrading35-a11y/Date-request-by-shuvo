@@ -1,0 +1,121 @@
+// Prisma Schema — Date Request Platform
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int       @id @default(autoincrement())
+  uuid         String    @unique @default(uuid())
+  fullName     String
+  username     String    @unique
+  email        String    @unique
+  passwordHash String
+  role         String    @default("sender") // sender | admin
+  isVerified   Boolean   @default(false)
+  isSuspended  Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  lastLoginAt  DateTime?
+
+  dateRequests  DateRequest[]
+  notifications Notification[]
+  sessions      Session[]
+  auditLogs     AuditLog[]
+}
+
+model DateRequest {
+  id           Int       @id @default(autoincrement())
+  uuid         String    @unique @default(uuid())
+  token        String    @unique
+  userId       Int
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  secretLetter String?
+  themeColor   String    @default("#FF6B9D")
+  isActive     Boolean   @default(true)
+  viewCount    Int       @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  responses  Response[]
+  analytics  Analytics[]
+}
+
+model Response {
+  id               Int         @id @default(autoincrement())
+  uuid             String      @unique @default(uuid())
+  requestId        Int
+  dateRequest      DateRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  receiverName     String?
+  selectedFoods    String      @default("[]") // JSON array stored as string
+  selectedActivity String?
+  selectedPlace    String?
+  selectedDate     DateTime?
+  selectedTime     String?
+  loveMeter        Int         @default(50)
+  personalMessage  String?
+  ipAddress        String?
+  country          String?
+  deviceType       String?
+  browser          String?
+  status           String      @default("pending") // pending | confirmed | rejected
+  submittedAt      DateTime    @default(now())
+}
+
+model Analytics {
+  id            Int         @id @default(autoincrement())
+  requestId     Int
+  dateRequest   DateRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  eventType     String      // view | submit | share
+  ipAddress     String?
+  country       String?
+  device        String?
+  browser       String?
+  createdAt     DateTime    @default(now())
+}
+
+model Notification {
+  id          Int      @id @default(autoincrement())
+  uuid        String   @unique @default(uuid())
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type        String   @default("response")
+  message     String
+  isRead      Boolean  @default(false)
+  referenceId String?
+  createdAt   DateTime @default(now())
+}
+
+model AuditLog {
+  id        Int      @id @default(autoincrement())
+  userId    Int?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action    String
+  ipAddress String?
+  userAgent String?
+  metadata  String?  // JSON stored as string
+  createdAt DateTime @default(now())
+}
+
+model Session {
+  id           Int      @id @default(autoincrement())
+  userId       Int
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refreshToken String   @unique
+  ipAddress    String?
+  userAgent    String?
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+}
+
+model Setting {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @updatedAt
+}
