@@ -104,6 +104,57 @@
       font-size: var(--text-sm);
       color: var(--color-text-muted);
     }
+
+    .dev-section {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 0 var(--space-6) var(--space-16);
+    }
+    .dev-card {
+      background: var(--gradient-card);
+      border: 1px solid var(--color-glass-border);
+      border-radius: var(--radius-xl, 20px);
+      padding: var(--space-8) var(--space-6);
+      text-align: center;
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow-card, 0 8px 32px rgba(0,0,0,0.08));
+    }
+    [data-theme="dark"] .dev-card { background: var(--gradient-card); border-color: var(--color-glass-border-dark); }
+    .dev-avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: var(--gradient-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      margin: 0 auto var(--space-4);
+      box-shadow: var(--shadow-glow, 0 0 20px rgba(255,107,157,0.4));
+    }
+    .dev-card h3 {
+      font-family: var(--font-display);
+      font-size: var(--text-xl);
+      color: var(--color-secondary);
+      margin-bottom: var(--space-1);
+    }
+    .dev-card .dev-role {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-4);
+    }
+    .dev-card p.dev-bio {
+      font-size: var(--text-base);
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-5);
+      line-height: 1.6;
+    }
+    .dev-links {
+      display: flex;
+      gap: var(--space-3);
+      justify-content: center;
+      flex-wrap: wrap;
+    }
   </style>
 </head>
 <body>
@@ -145,6 +196,20 @@
         <p>See exactly when they open it and what they answer, right from your dashboard.</p>
       </div>
     </section>
+    <section class="dev-section">
+      <div class="dev-card">
+        <div class="dev-avatar">👨‍💻</div>
+        <h3>Made by Shuvo</h3>
+        <div class="dev-role">Developer</div>
+        <p class="dev-bio">
+          I build bots, tools, and small apps like this one — usually late at night, always with a little extra care in the details. Date Request started as a fun side project to help people ask someone out in a way that actually feels special.
+        </p>
+        <div class="dev-links">
+          <a href="https://t.me/shuvo_9882" target="_blank" rel="noopener" class="btn btn-secondary btn-sm">💬 Message on Telegram</a>
+        </div>
+      </div>
+    </section>
+
   </main>
 
   <footer class="landing-footer">
