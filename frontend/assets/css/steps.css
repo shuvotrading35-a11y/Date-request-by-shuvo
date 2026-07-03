@@ -3,6 +3,38 @@
    Date Request Platform
    ============================================ */
 
+/* ── Intro / App Visibility (was missing — caused all steps to stack visibly) ── */
+#intro-screen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  transition: opacity 0.7s var(--ease-smooth), transform 0.7s var(--ease-smooth);
+}
+#intro-screen.exit {
+  opacity: 0;
+  transform: scale(0.96);
+  pointer-events: none;
+}
+
+#app {
+  display: none;
+}
+#app.visible {
+  display: block;
+}
+
+.step-screen {
+  display: none;
+}
+.step-screen.active {
+  display: block;
+}
+
 /* ── Receiver Page Hero ── */
 .receiver-hero {
   position: relative;

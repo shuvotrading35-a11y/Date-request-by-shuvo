@@ -629,6 +629,7 @@ async function submitResponse() {
 
   const payload = {
     requestId:    RESPONSE.requestId,
+    receiverName:     document.getElementById('receiver-name')?.value?.trim() || null,
     selectedFoods:    RESPONSE.foods,
     selectedActivity: RESPONSE.activity,
     selectedPlace:    RESPONSE.place,
