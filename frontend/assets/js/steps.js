@@ -93,7 +93,7 @@ function startJourney() {
 async function loadRequestFromURL() {
   const parts = window.location.pathname.split('/');
   const token = parts[parts.length - 1];
-  if (token && token.length > 4 && token !== 'index.html') {
+  if (token && token.length > 4 && token !== 'index.html' && token !== 'date.html' && token !== 'date') {
     RESPONSE.token = token;
     try {
       const result = await apiFetch(`/public/date/${token}`);
