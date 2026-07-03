@@ -321,7 +321,7 @@ async function viewResponseDetail(uuid) {
 // EXPORT
 // ============================================
 async function exportData(format, requestId = '') {
-  const url = `/api/v1/dashboard/export?format=${format}${requestId ? `&requestId=${requestId}` : ''}`;
+  const url = `${window.API_BASE_URL}/dashboard/export?format=${format}${requestId ? `&requestId=${requestId}` : ''}`;
   const token = localStorage.getItem('access_token');
   try {
     const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });

@@ -482,7 +482,7 @@ async function savePlatformSettings(e) {
 async function adminExport(type, format) {
   const token = localStorage.getItem('access_token');
   try {
-    const res = await fetch(`/api/v1/admin/export?type=${type}&format=${format}`, {
+    const res = await fetch(`${window.API_BASE_URL}/admin/export?type=${type}&format=${format}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     if (!res.ok) { showToast('Export failed', 'error'); return; }

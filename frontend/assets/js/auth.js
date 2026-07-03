@@ -64,7 +64,7 @@ async function checkUsername(username) {
 
   usernameTimer = setTimeout(async () => {
     try {
-      const res = await fetch(`/api/v1/auth/check-username?username=${encodeURIComponent(username)}`);
+      const res = await fetch(`${window.API_BASE_URL}/auth/check-username?username=${encodeURIComponent(username)}`);
       const data = await res.json();
       if (data.available) {
         status.textContent = '✅ Available!';
@@ -168,7 +168,7 @@ async function handleRegister(e) {
   setLoading(submitBtn, true);
 
   try {
-    const res = await fetch('/api/v1/auth/register', {
+    const res = await fetch(`${window.API_BASE_URL}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ fullName, username, email, password }),
@@ -214,7 +214,7 @@ async function handleLogin(e) {
   setLoading(submitBtn, true);
 
   try {
-    const res = await fetch('/api/v1/auth/login', {
+    const res = await fetch(`${window.API_BASE_URL}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -264,7 +264,7 @@ async function handleForgotPassword(e) {
   setLoading(submitBtn, true);
 
   try {
-    const res = await fetch('/api/v1/auth/forgot-password', {
+    const res = await fetch(`${window.API_BASE_URL}/auth/forgot-password`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email }),
@@ -305,7 +305,7 @@ async function handleResetPassword(e) {
   setLoading(submitBtn, true);
 
   try {
-    const res = await fetch(`/api/v1/auth/reset-password/${token}`, {
+    const res = await fetch(`${window.API_BASE_URL}/auth/reset-password/${token}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ password }),
@@ -344,7 +344,7 @@ function setLoading(btn, loading) {
 // ============================================
 async function logout() {
   try {
-    await fetch('/api/v1/auth/logout', {
+    await fetch(`${window.API_BASE_URL}/auth/logout`, {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` },
       credentials: 'include',
