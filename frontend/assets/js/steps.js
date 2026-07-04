@@ -10,6 +10,7 @@ const RESPONSE = {
   token: null,
   requestId: null,
   senderName: null,
+  receiverName: null,
   secretLetter: null,
   foods: [],
   activity: null,
@@ -208,6 +209,23 @@ function updateProgressBar(step) {
 // STEP 1 — YES / NO
 // ============================================
 function answerYes() {
+  const nameInput = document.getElementById('receiver-name');
+  const nameError = document.getElementById('name-error');
+  const name = nameInput?.value?.trim();
+
+  if (!name) {
+    if (nameError) nameError.style.display = 'block';
+    if (nameInput) {
+      nameInput.focus();
+      nameInput.style.animation = 'shake 0.4s';
+      setTimeout(() => nameInput.style.animation = '', 400);
+    }
+    showToast('Please tell me your name first 🥺', 'warning');
+    return;
+  }
+  if (nameError) nameError.style.display = 'none';
+  RESPONSE.receiverName = name;
+
   const btn = document.querySelector('.yes-btn');
   if (btn) {
     btn.style.animation = 'none';
@@ -629,7 +647,7 @@ async function submitResponse() {
 
   const payload = {
     requestId:    RESPONSE.requestId,
-    receiverName:     document.getElementById('receiver-name')?.value?.trim() || null,
+    receiverName:     RESPONSE.receiverName || null,
     selectedFoods:    RESPONSE.foods,
     selectedActivity: RESPONSE.activity,
     selectedPlace:    RESPONSE.place,

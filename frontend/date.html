@@ -556,6 +556,16 @@
       <h1 class="proposal-title">Will You Go On A Date With Me? 🌸</h1>
       <p class="proposal-subtitle">"I spent way too long making this...<br>Please don't break my heart 🥺"</p>
 
+      <div style="max-width:320px;margin:0 auto var(--space-4);text-align:left;">
+        <label for="receiver-name" style="display:block;font-size:var(--text-sm);font-weight:600;color:var(--color-text-secondary);margin-bottom:var(--space-2);">What's your name? 💌</label>
+        <input type="text" id="receiver-name" class="message-textarea" maxlength="60"
+          placeholder="Type your name here..."
+          aria-label="Your name"
+          required
+          style="min-height:auto;" />
+        <p id="name-error" style="display:none;color:var(--color-error, #E24C6D);font-size:var(--text-sm);margin-top:var(--space-1);">Please tell me your name first 🥺</p>
+      </div>
+
       <div style="display:flex;flex-direction:column;align-items:center;gap:var(--space-3);">
         <button class="btn btn-primary yes-btn animate-glow" onclick="answerYes()" aria-label="Yes I will go on a date">
           💖 YES! I'll Go! 💖
@@ -709,11 +719,6 @@
       <p class="step-sub">(Optional, but it makes it extra special 🥺)</p>
     </div>
     <div class="message-wrapper">
-      <label for="receiver-name" class="step-sub" style="display:block;text-align:left;margin-bottom:var(--space-2);">Your name (optional)</label>
-      <input type="text" class="message-textarea" id="receiver-name" maxlength="60"
-        placeholder="So they know who said YES 😊"
-        aria-label="Your name, optional"
-        style="min-height:auto;margin-bottom:var(--space-4);" />
       <textarea class="message-textarea" id="personal-message" maxlength="300"
         placeholder="Write something sweet... I promise I'll blush 💕"
         aria-label="Personal message, optional"
