@@ -86,8 +86,15 @@ function startJourney() {
   setTimeout(() => {
     intro.style.display = 'none';
     app.classList.add('visible');
+    // Step screens are position:absolute, so #app needs an explicit
+    // height on first reveal or it collapses to 0 before any transition
+    // has run to set one.
+    const firstStep = document.getElementById('step-1');
+    if (firstStep) app.style.height = firstStep.offsetHeight + 'px';
     // Load token from URL
-    loadRequestFromURL();
+    loadRequestFromURL().then(() => {
+      if (firstStep) app.style.height = firstStep.offsetHeight + 'px';
+    });
   }, 800);
 }
 
@@ -127,20 +134,22 @@ function goStep(n, direction = 'forward') {
   const to   = document.getElementById(`step-${n}`);
   if (!to) return;
 
+  const app = document.getElementById('app');
+
+  // Lock the container's current height before both slides briefly
+  // overlap (both are position:absolute) — without this, #app would
+  // collapse to 0 height the instant "from" starts leaving, causing
+  // everything below it to jump, then jump again when "to" arrives.
+  if (app && from) {
+    app.style.height = from.offsetHeight + 'px';
+  }
+
   // Animate out
   if (from) {
-    from.style.position = 'absolute';
-    from.style.top = '0';
-    from.style.left = '0';
-    from.style.width = '100%';
     from.style.animation = `slideOutLeft 0.25s var(--ease-smooth) both`;
     setTimeout(() => {
       from.classList.remove('active');
       from.style.animation = '';
-      from.style.position = '';
-      from.style.top = '';
-      from.style.left = '';
-      from.style.width = '';
     }, 250);
   }
 
@@ -151,6 +160,15 @@ function goStep(n, direction = 'forward') {
     setTimeout(() => to.style.animation = '', 350);
     currentStep = n;
     updateProgressBar(n);
+
+    // Resize the container to fit the new step, then release the fixed
+    // height so content that changes size later (e.g. selecting more
+    // food items) can still grow/shrink naturally.
+    if (app) {
+      app.style.height = to.offsetHeight + 'px';
+      setTimeout(() => { app.style.height = ''; }, 350);
+    }
+
     // Scroll to top
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, 200);
