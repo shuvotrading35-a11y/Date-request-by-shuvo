@@ -405,11 +405,31 @@ async function takeScreenshot(element, filename = 'date-request.png') {
     await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
   }
   try {
+    // Wait for fonts to be ready so text doesn't render with fallback metrics
+    if (document.fonts && document.fonts.ready) {
+      await document.fonts.ready;
+    }
     const canvas = await html2canvas(element, {
       backgroundColor: '#FFF0F5',
       scale: 2,
       useCORS: true,
       allowTaint: true,
+      onclone: (clonedDoc, clonedEl) => {
+        // html2canvas doesn't support backdrop-filter — it can break layout
+        // and let elements behind the card bleed through. Strip it only on
+        // the clone used for rendering; the live page is untouched.
+        const targets = [clonedEl, ...clonedEl.querySelectorAll('*')];
+        targets.forEach(node => {
+          const style = clonedDoc.defaultView.getComputedStyle(node);
+          if (style.backdropFilter && style.backdropFilter !== 'none') {
+            node.style.backdropFilter = 'none';
+            node.style.webkitBackdropFilter = 'none';
+          }
+        });
+        // Give the card itself a solid opaque background since the blur
+        // effect (which relied on backdrop-filter) is now gone.
+        clonedEl.style.background = '#FFF5F8';
+      },
     });
     const link = document.createElement('a');
     link.download = filename;
