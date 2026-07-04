@@ -129,10 +129,18 @@ function goStep(n, direction = 'forward') {
 
   // Animate out
   if (from) {
+    from.style.position = 'absolute';
+    from.style.top = '0';
+    from.style.left = '0';
+    from.style.width = '100%';
     from.style.animation = `slideOutLeft 0.25s var(--ease-smooth) both`;
     setTimeout(() => {
       from.classList.remove('active');
       from.style.animation = '';
+      from.style.position = '';
+      from.style.top = '';
+      from.style.left = '';
+      from.style.width = '';
     }, 250);
   }
 
@@ -680,9 +688,12 @@ function showConfirmation() {
   document.getElementById('app').style.display = 'none';
   document.getElementById('progress-area').style.display = 'none';
 
-  // Show confirm
+  // Show confirm with a single, clean entrance animation
   const screen = document.getElementById('confirm-screen');
   screen.classList.add('active');
+  screen.style.animation = 'fadeInUp 0.6s var(--ease-smooth) both';
+  const card = screen.querySelector('.confirm-card');
+  if (card) card.style.animation = 'bounceIn 0.7s var(--ease-bounce) both';
 
   // Subtitle
   const sub = document.getElementById('confirm-sub');
@@ -717,7 +728,6 @@ function showConfirmation() {
   setTimeout(() => {
     launchConfetti(4000);
     spawnFloatingHearts(25);
-    screen.style.animation = 'fadeInUp 0.8s ease both';
   }, 200);
 }
 

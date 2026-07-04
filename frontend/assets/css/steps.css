@@ -4,6 +4,9 @@
    ============================================ */
 
 /* ── Step Screen Visibility (was missing — caused all steps to stack visibly) ── */
+#app {
+  position: relative;
+}
 .step-screen {
   display: none;
 }
