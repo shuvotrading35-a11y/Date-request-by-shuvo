@@ -18,6 +18,18 @@
   display: block;
 }
 
+/* Animating backdrop-filter (blur) is one of the most expensive things a
+   mobile GPU can do — it must re-sample the background every frame while
+   the element moves. Disable it only during the brief transition window
+   so slides move smoothly, then it returns once settled. */
+#app.is-transitioning .step-screen * {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+.step-screen {
+  will-change: transform, opacity;
+}
+
 /* ── Receiver Page Hero ── */
 .receiver-hero {
   position: relative;

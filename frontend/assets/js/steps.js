@@ -143,6 +143,13 @@ function goStep(n, direction = 'forward') {
   if (app && from) {
     app.style.height = from.offsetHeight + 'px';
   }
+  // Drop expensive blur effects for the duration of the slide so the
+  // animation doesn't compete with the GPU for frames (see CSS).
+  if (app) app.classList.add('is-transitioning');
+  // Jump to top instantly instead of animating scroll — a smooth-scroll
+  // running at the same time as the slide animation was competing for
+  // frames and reading as extra lag.
+  window.scrollTo(0, 0);
 
   // Animate out
   if (from) {
@@ -156,8 +163,11 @@ function goStep(n, direction = 'forward') {
   // Animate in
   setTimeout(() => {
     to.classList.add('active');
-    to.style.animation = `slideInRight 0.3s var(--ease-bounce) both`;
-    setTimeout(() => to.style.animation = '', 350);
+    to.style.animation = `slideInRight 0.3s var(--ease-smooth) both`;
+    setTimeout(() => {
+      to.style.animation = '';
+      if (app) app.classList.remove('is-transitioning');
+    }, 350);
     currentStep = n;
     updateProgressBar(n);
 
@@ -168,9 +178,6 @@ function goStep(n, direction = 'forward') {
       app.style.height = to.offsetHeight + 'px';
       setTimeout(() => { app.style.height = ''; }, 350);
     }
-
-    // Scroll to top
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   }, 200);
 }
 
