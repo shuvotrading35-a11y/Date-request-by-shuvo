@@ -755,7 +755,7 @@ function openLetter() {
   const wrap = document.getElementById('envelope-wrap');
   const text = document.getElementById('letter-text');
   if (icon) { icon.textContent = '💌'; icon.style.animation = ''; }
-  if (wrap) wrap.style.display = 'block';
+  if (wrap) { wrap.style.display = 'block'; wrap.style.opacity = '1'; }
   if (text) text.classList.remove('visible');
 
   openModal('letter-modal');
@@ -777,7 +777,11 @@ function openEnvelope() {
     }, 300);
     setTimeout(() => {
       icon.textContent = '📄';
-      if (wrap) wrap.style.opacity = '0.3';
+      if (wrap) {
+        wrap.style.transition = 'opacity 0.4s ease';
+        wrap.style.opacity = '0';
+        setTimeout(() => { if (wrap) wrap.style.display = 'none'; }, 400);
+      }
       if (text) text.classList.add('visible');
       spawnFloatingHearts(8);
     }, 700);
